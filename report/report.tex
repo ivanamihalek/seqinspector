@@ -1,0 +1,131 @@
+\documentclass[fleqn]{scrartcl}% fleqn aligns math equations to the left
+\usepackage[T1]{fontenc}%
+\usepackage[utf8]{inputenc}%
+\usepackage{lmodern}%
+\usepackage{textcomp}%
+\usepackage{lastpage}%
+\usepackage{parskip}%
+\usepackage[letterpaper,left=0.8in, right=0.75in, top=1.0in, bottom=0.75in, includefoot, heightrounded]{geometry}%
+\usepackage{graphicx}%
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}%
+
+\newcommand{\etal}{\textit{\!et al.\,}}
+
+
+\title{Template task report}%
+\author{Ivana Mihalek}%
+\date{\today}%
+%
+\begin{document}
+	%
+\normalsize%
+\maketitle%
+\section*{Summary}
+
+\vspace{0.5in}
+
+\clearpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quality of the original sets}
+
+The quality of the original reads was estimated using FastQC tool~\cite{fastqc}, Table\,\ref{table:before}.
+reads in the targeted regions dwindles to several tens or lower after de-duplication (see the subdirectory called
+"fastqc" in the accompanying processing pipeline, and the  accompanying spreadsheet).
+
+
+\begin{table}[ht]
+	\begin{tabular}{ |l||l |l |l |l |  }
+		\hline
+		Issue & AH\_S1, R1  & AH\_S1, R2   & CH\_S2, R1  & CH\_S2, R2 \\
+		\hline
+		Adapter Content & FAIL  & FAIL  & ok  & ok \\
+		Overrepresented sequences & FAIL  & FAIL  & ok  & ok \\
+		Per base sequence content & warn  & warn  & warn  & warn \\
+		Per sequence GC content & warn  & FAIL  & FAIL  & FAIL \\
+		Sequence Duplication Levels & FAIL  & FAIL  & FAIL  & FAIL \\
+		Sequence Length Distribution & ok  & ok  & warn  & warn \\
+		\hline
+	\end{tabular}
+	\caption{Quality check by FastQC,  on the original read sets. R1 and R2 are read direction labels, as in
+	the original fastq files. The full description of the issues investigated by FastQC can be found
+	 on its help site  \url{https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/}.}
+	\label{table:before}
+\end{table}
+
+\section{Read processing and alignment}
+The adapters are trimmed using
+cutadapt\footnote{Installation instructions at
+\url{https://cutadapt.readthedocs.io/en/stable/installation.html}}~\cite{martin2011cutadapt}.
+%
+A recommended step prior to duplicate removal is the alignment of reads to the reference
+sequence, for which purpose we used
+bwa aligner\footnote{Available at \url{https://github.com/lh3/bwa}}~\cite{li2010fast}.
+%
+Duplicates are removed using
+samtools\footnote{Available at \url{http://www.htslib.org/download/}}~\cite{li2009sequence}.
+Default input options are used for all of these tools whenever possible. For details,
+see the implementation.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quality after processing}
+
+FastQC\footnote{See here:
+\url{https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3\%20Analysis\%20Modules/12\%20Per\%20Tile\%20Sequence\%20Quality.html}}
+
+\begin{table}[ht]
+	\begin{tabular}{ |l||l |l |l |l |  }
+		\hline
+		Issue & AH\_S1, R1  & AH\_S1, R2   & CH\_S2, R1  & CH\_S2, R2 \\
+		\hline
+		Overrepresented sequences & FAIL  & warn  & warn  & ok \\
+		Per base sequence content & warn  & warn  & warn  & warn \\
+		Per sequence GC content & FAIL  & FAIL  & warn  & warn \\
+		Per tile sequence quality & FAIL  & FAIL  & ok  & ok \\
+		Sequence Length Distribution & FAIL  & warn  & warn  & warn \\
+		\hline
+	\end{tabular}
+	\caption{Quality check by FastQC,  after processing. R1 and R2 are read direction labels, as in
+	the original fastq files. The full description of the issues investigated by FastQC can be found
+	 on its help site  \url{https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/}.}
+	\label{table:after}
+\end{table}
+
+%
+\begin{figure}[ht]%
+	\centering{\includegraphics[width=\linewidth]{figures/png/igv.png}}
+	\caption {\textbf{A typical scenario for AH ``reads.''}
+	The region corresponding to NRAS gene on chromosome 1. \textbf{Upper panel:} AH set. \textbf{Lower:} CH set.
+	Visualization produced using IGV viewer~\cite{robinson2011integrative}.
+	The reads are shown in ``squished'' representation.  The top bar in each panel shows the relative depth at each position.}
+	\label{fig:igv}
+\end{figure}
+%
+
+%
+\begin{figure}[ht]%
+	\centering{\includegraphics[width=0.75\linewidth]{figures/png/depth.png}}
+	\caption {\textbf{Average depth of sequencing and region coverage in the two sets, after duplicate removal.}
+	The overlapping target regions for the two sets were merged, and the regions ordered by depth in CH.
+	Transparent bars indicate less than 50\% coverage of the merged region length.
+	Note the logarithmic scale on the vertical axis. }
+	\label{fig:depth}
+\end{figure}
+%
+
+
+\section{Conclusion}
+
+
+
+%
+\clearpage
+\bibliographystyle{plos2009}
+\bibliography{report}
+
+\end{document}
